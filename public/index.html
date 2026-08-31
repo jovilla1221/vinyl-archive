@@ -6,21 +6,17 @@
 <meta name="theme-color" content="#000000">
 <title>VINYL ARCHIVE</title>
 <style>
-  /* ===== reset ===== */
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:#000;color:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,"Inter","Helvetica Neue",system-ui,sans-serif;font-feature-settings:"ss01","cv11";-webkit-font-smoothing:antialiased;overflow:hidden}
+  html,body{height:100%;background:#000;color:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,"Inter","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
   button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   a{color:inherit;text-decoration:none}
 
-  /* ===== bg layers ===== */
   .bg-vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.7) 100%);pointer-events:none;z-index:1}
-  .bg-grain{position:fixed;inset:0;opacity:0.08;mix-blend-mode:overlay;pointer-events:none;z-index:2;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/</filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/</svg>")}
+  .bg-grain{position:fixed;inset:0;opacity:0.08;mix-blend-mode:overlay;pointer-events:none;z-index:2;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/</filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/</svg>")}
   .dust{position:fixed;inset:0;pointer-events:none;z-index:3;overflow:hidden}
   .dust i{position:absolute;display:block;width:2px;height:2px;background:rgba(255,255,255,0.4);border-radius:50%;animation:float linear infinite}
-  @keyframes float{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) translateX(40px);opacity:0}}
+  @keyframes float{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh);opacity:0}}
 
-  /* ===== nav ===== */
   nav.top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;backdrop-filter:blur(12px);background:rgba(0,0,0,0.3)}
   .logo{font-weight:800;letter-spacing:0.18em;font-size:13px}
   .nav-links{display:flex;gap:28px;font-size:11px;letter-spacing:0.22em;color:#999}
@@ -30,88 +26,32 @@
   .icon-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;transition:background 200ms ease;font-size:14px;color:#bbb}
   .icon-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
 
-  /* ===== scene ===== */
-  .scene{position:fixed;inset:0;z-index:10;display:grid;place-items:center;perspective:1600px;perspective-origin:50% 60%}
+  .scene{position:fixed;inset:0;z-index:10;display:grid;place-items:center;perspective:1600px;perspective-origin:50% 60%;overflow:hidden}
   .stack{position:relative;transform-style:preserve-3d;transform:rotateX(8deg) rotateY(-3deg);transition:transform 800ms cubic-bezier(0.65,0,0.35,1)}
 
-  /* ===== album card ===== */
-  .album{
-    position:relative;
-    width:320px;height:320px;
-    border-radius:6px;
-    cursor:pointer;
-    transform-style:preserve-3d;
-    transition:transform 700ms cubic-bezier(0.34,1.4,0.64,1),filter 400ms ease,opacity 400ms ease;
-    filter:brightness(0.7);
-  }
+  .album{position:relative;width:320px;height:320px;border-radius:6px;cursor:pointer;transform-style:preserve-3d;transition:transform 700ms cubic-bezier(0.34,1.4,0.64,1),filter 400ms ease,opacity 400ms ease;filter:brightness(0.7)}
   .album:hover{filter:brightness(1)}
   .album.active{filter:brightness(1);z-index:30}
   .album.dim{filter:brightness(0.3) blur(1px);opacity:0.6}
 
-  /* layered bevel via shadows + pseudo edges */
-  .album .cover{
-    position:absolute;inset:0;border-radius:6px;overflow:hidden;
-    transform-origin:left center;transform-style:preserve-3d;
-    transition:transform 800ms cubic-bezier(0.65,0,0.35,1);
-    z-index:2;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.18),    /* top bevel highlight */
-      inset 0 -1px 0 rgba(0,0,0,0.5),          /* bottom bevel */
-      inset 1px 0 0 rgba(255,255,255,0.06),    /* right bevel */
-      inset -1px 0 0 rgba(0,0,0,0.4),
-      0 24px 60px rgba(0,0,0,0.55),            /* drop shadow */
-      0 4px 14px rgba(0,0,0,0.4);
-  }
+  .album .cover{position:absolute;inset:0;border-radius:6px;overflow:hidden;transform-origin:left center;transform-style:preserve-3d;transition:transform 800ms cubic-bezier(0.65,0,0.35,1);z-index:2;box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(0,0,0,0.5),inset 1px 0 0 rgba(255,255,255,0.06),inset -1px 0 0 rgba(0,0,0,0.4),0 24px 60px rgba(0,0,0,0.55),0 4px 14px rgba(0,0,0,0.4)}
   .album .cover-art{position:absolute;inset:0;background-size:cover;background-position:center}
-  .album .cover::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(180deg,rgba(255,255,255,0.12),transparent 25%,transparent 70%,rgba(0,0,0,0.35));
-    pointer-events:none;
-  }
-  .album .cover-label{
-    position:absolute;top:10px;left:14px;right:14px;
-    display:flex;flex-direction:column;gap:2px;
-    font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.6);z-index:3;
-  }
+  .album .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.12),transparent 25%,transparent 70%,rgba(0,0,0,0.35));pointer-events:none}
+  .album .cover-label{position:absolute;top:10px;left:14px;right:14px;display:flex;flex-direction:column;gap:2px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.6);z-index:3}
   .album .cover-label .t{font-size:14px;letter-spacing:-0.01em;line-height:1.1}
   .album .cover-label .a{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.85;font-weight:500}
 
-  /* vinyl disc inside */
-  .album .sleeve{
-    position:absolute;inset:0;border-radius:6px;overflow:hidden;
-    background:#0a0a0a;
-    z-index:1;
-    display:grid;place-items:center;
-  }
-  .album .disc{
-    width:82%;aspect-ratio:1;border-radius:50%;
-    background:
-      radial-gradient(circle at 50% 50%, var(--label,#c4302b) 0 22%, transparent 22.5%),
-      repeating-radial-gradient(circle at 50% 50%,#0a0a0a 0 1px,#1a1a1a 1px 3px,#0a0a0a 3px 5px,#141414 5px 7px),
-      #0a0a0a;
-    box-shadow:
-      inset 0 0 30px rgba(0,0,0,0.8),
-      0 0 0 1px rgba(255,255,255,0.05),
-      0 20px 40px rgba(0,0,0,0.6);
-    position:relative;
-    opacity:0;transform:translateX(20%) scale(0.85);
-    transition:opacity 400ms ease 200ms,transform 600ms cubic-bezier(0.34,1.4,0.64,1) 200ms;
-  }
-  .album .disc::after{
-    content:"";position:absolute;inset:0;border-radius:50%;
-    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.06),transparent 40%);
-    pointer-events:none;
-  }
+  .album .sleeve{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:#0a0a0a;z-index:1;display:grid;place-items:center}
+  .album .disc{width:82%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--label,#c4302b) 0 22%,transparent 22.5%),repeating-radial-gradient(circle at 50% 50%,#0a0a0a 0 1px,#1a1a1a 1px 3px,#0a0a0a 3px 5px,#141414 5px 7px),#0a0a0a;box-shadow:inset 0 0 30px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.05),0 20px 40px rgba(0,0,0,0.6);position:relative;opacity:0;transform:translateX(20%) scale(0.85);transition:opacity 400ms ease 200ms,transform 600ms cubic-bezier(0.34,1.4,0.64,1) 200ms}
+  .album .disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.06),transparent 40%);pointer-events:none}
   .album .disc .hole{position:absolute;top:50%;left:50%;width:10px;height:10px;background:#000;border-radius:50%;transform:translate(-50%,-50%);box-shadow:inset 0 0 2px rgba(255,255,255,0.2)}
   .album .disc .label-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;text-align:center;width:34%;line-height:1.2;opacity:0.85}
 
-  /* open state */
   .album.open{transform:translateZ(140px) rotateX(0deg)}
   .album.open .cover{transform:perspective(1200px) rotateY(-135deg)}
   .album.open .disc{opacity:1;transform:translateX(8%) scale(1);animation:spin 6s linear infinite}
   @keyframes spin{to{transform:translateX(8%) scale(1) rotate(360deg)}}
 
-  /* stacked position offsets */
   .album:nth-child(1){transform:translateY(-380px) translateX(-20px) rotateX(28deg) rotateZ(-4deg)}
   .album:nth-child(2){transform:translateY(-285px) translateX(15px) rotateX(24deg) rotateZ(2deg)}
   .album:nth-child(3){transform:translateY(-190px) translateX(-10px) rotateX(20deg) rotateZ(-2deg)}
@@ -121,51 +61,34 @@
   .album:nth-child(7){transform:translateY(190px) translateX(-4px) rotateX(4deg) rotateZ(-1deg)}
   .album.open:nth-child(n){transform:translateZ(140px) rotateX(0)}
 
-  /* ===== hint ===== */
   .hint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:40;font-size:10px;letter-spacing:0.4em;color:#666;text-transform:uppercase;opacity:0;animation:fadein 1.2s ease 600ms forwards;pointer-events:none}
   @keyframes fadein{to{opacity:1}}
 
-  /* ===== player ===== */
-  .player{
-    position:fixed;left:50%;bottom:24px;transform:translate(-50%,120%);z-index:60;
-    width:min(640px,calc(100vw - 32px));
-    background:rgba(15,15,15,0.85);backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,0.08);border-radius:14px;
-    padding:14px 18px;display:flex;align-items:center;gap:14px;
-    transition:transform 600ms cubic-bezier(0.34,1.2,0.64,1);
-    box-shadow:0 20px 50px rgba(0,0,0,0.6);
-  }
+  .player{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120%);z-index:60;width:min(640px,calc(100vw - 32px));background:rgba(15,15,15,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:transform 600ms cubic-bezier(0.34,1.2,0.64,1);box-shadow:0 20px 50px rgba(0,0,0,0.6)}
   .player.show{transform:translate(-50%,0)}
   .player .np-cover{width:48px;height:48px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
   .player .np-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .player .np-title{font-size:13px;font-weight:600;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .player .np-artist{font-size:10px;color:#888;letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .player .progress{flex:1;height:2px;background:rgba(255,255,255,0.08);border-radius:1px;overflow:hidden;margin:0 8px}
+  .player .progress{flex:1;height:2px;background:rgba(255,255,255,0.08);border-radius:1px;overflow:hidden;margin:0 8px;min-width:40px}
   .player .progress span{display:block;height:100%;width:0;background:#fff;transition:width 100ms linear}
-  .player button.play{
-    width:36px;height:36px;border-radius:50%;
-    background:#fff;color:#000;
-    display:grid;place-items:center;font-size:11px;
-    transition:transform 200ms ease;
-  }
+  .player button.play{width:36px;height:36px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-size:11px;transition:transform 200ms ease;flex-shrink:0}
   .player button.play:hover{transform:scale(1.05)}
 
-  /* ===== mobile ===== */
   @media (max-width:720px){
     nav.top{padding:14px 18px}
     .nav-links{display:none}
-    .stack{transform:none;display:flex;flex-direction:row;align-items:center;gap:24px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 20vw;width:100vw;height:100vh;perspective:none}
+    .scene{perspective:none}
+    .stack{transform:none;display:flex;flex-direction:row;align-items:center;gap:20px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 15vw;width:100vw;height:60vh;margin-top:60vh;transform-style:flat}
     .stack::-webkit-scrollbar{display:none}
-    .album{scroll-snap-align:center;flex-shrink:0;transform:none!important;width:260px;height:260px}
+    .album{scroll-snap-align:center;flex-shrink:0;transform:none!important;width:240px;height:240px}
     .album.open{transform:translateY(-30px) scale(1.05)!important}
-    .hint{bottom:120px}
+    .hint{bottom:140px}
   }
 
-  /* hide other albums on desktop when one is open */
   body.opening .album:not(.active){opacity:0.15;filter:brightness(0.3)}
   body.opening .stack{transform:rotateX(0deg) rotateY(0deg)}
 
-  /* prefers-reduced-motion */
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
   }
@@ -185,8 +108,8 @@
     <a href="#">ABOUT</a>
  </div>
   <div class="nav-actions">
-    <button class="icon-btn" aria-label="Search">⌕</button>
-    <button class="icon-btn" aria-label="Sound">♪</button>
+    <button class="icon-btn" aria-label="Search">&#9906</button>
+    <button class="icon-btn" aria-label="Sound">&#9834</button>
  </div>
 </nav>
 
@@ -203,65 +126,60 @@
     <div class="np-artist" id="np-artist">—</div>
  </div>
   <div class="progress" id="progress"><span id="progress-bar</span</div>
-  <button class="play" id="play-btn" aria-label="Play">▶</button>
+  <button class="play" id="play-btn" aria-label="Play">&#9654</button>
 </div>
 
 <audio id="audio" preload="none</audio>
 
 <script>
-/* ===== data: replace cover/audio URLs with real assets ===== */
 const ALBUMS = [
-  {title:"Come Together",       artist:"The Beatles",      album:"Abbey Road",              year:1969, genre:"Rock",     cover:"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg", audio:"", label:"#1a1a1a"},
-  {title:"Pink + White",        artist:"Frank Ocean",      album:"Blonde",                  year:2016, genre:"R&B",      cover:"https://upload.wikimedia.org/wikipedia/en/a/a0/Frank_Ocean_-_Blonde.jpeg", audio:"", label:"#f5e6c8"},
-  {title:"Titi Me Preguntó",    artist:"Bad Bunny",        album:"Un Verano Sin Ti",        year:2022, genre:"Reggaeton",cover:"https://upload.wikimedia.org/wikipedia/en/d/d3/Bad_Bunny_-_Un_Verano_Sin_Ti.png", audio:"", label:"#d44a2e"},
-  {title:"Taste",               artist:"Sabrina Carpenter",album:"Short n' Sweet",          year:2024, genre:"Pop",      cover:"https://upload.wikimedia.org/wikipedia/en/3/3a/Sabrina_Carpenter_-_Short_n%27_Sweet.png", audio:"", label:"#3a6ea5"},
-  {title:"Cry For Me",          artist:"The Weeknd",       album:"Hurry Up Tomorrow",       year:2025, genre:"R&B",      cover:"https://upload.wikimedia.org/wikipedia/en/c/c3/The_Weeknd_-_Hurry_Up_Tomorrow.png", audio:"", label:"#1a1a1a"},
-  {title:"Wildest Dreams",      artist:"Taylor Swift",     album:"1989",                    year:2014, genre:"Pop",      cover:"https://upload.wikimedia.org/wikipedia/en/f/f6/Taylor_Swift_-_1989.png", audio:"", label:"#87ceeb"},
-  {title:"360",                 artist:"Charli xcx",       album:"BRAT",                    year:2024, genre:"Hyperpop", cover:"https://upload.wikimedia.org/wikipedia/en/4/4c/Charli_XCX_-_Brat_%28album%29.png", audio:"", label:"#8ace00"},
+  {title:"Come Together", artist:"The Beatles", album:"Abbey Road", year:1969, cover:"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg", audio:"", label:"#1a1a1a"},
+  {title:"Pink + White", artist:"Frank Ocean", album:"Blonde", year:2016, cover:"https://upload.wikimedia.org/wikipedia/en/a/a0/Frank_Ocean_-_Blonde.jpeg", audio:"", label:"#f5e6c8"},
+  {title:"Titi Me Pregunt\u00f3", artist:"Bad Bunny", album:"Un Verano Sin Ti", year:2022, cover:"https://upload.wikimedia.org/wikipedia/en/d/d3/Bad_Bunny_-_Un_Verano_Sin_Ti.png", audio:"", label:"#d44a2e"},
+  {title:"Taste", artist:"Sabrina Carpenter", album:"Short n' Sweet", year:2024, cover:"https://upload.wikimedia.org/wikipedia/en/3/3a/Sabrina_Carpenter_-_Short_n%27_Sweet.png", audio:"", label:"#3a6ea5"},
+  {title:"Cry For Me", artist:"The Weeknd", album:"Hurry Up Tomorrow", year:2025, cover:"https://upload.wikimedia.org/wikipedia/en/c/c3/The_Weeknd_-_Hurry_Up_Tomorrow.png", audio:"", label:"#1a1a1a"},
+  {title:"Wildest Dreams", artist:"Taylor Swift", album:"1989", year:2014, cover:"https://upload.wikimedia.org/wikipedia/en/f/f6/Taylor_Swift_-_1989.png", audio:"", label:"#87ceeb"},
+  {title:"360", artist:"Charli xcx", album:"BRAT", year:2024, cover:"https://upload.wikimedia.org/wikipedia/en/4/4c/Charli_XCX_-_Brat_%28album%29.png", audio:"", label:"#8ace00"}
 ];
 
-/* ===== render ===== */
 const stack = document.getElementById("stack");
 const frag = document.createDocumentFragment();
 
-ALBUMS.forEach((a,i)=>{
+ALBUMS.forEach(function(a,i){
   const el = document.createElement("div");
   el.className = "album";
   el.style.setProperty("--label", a.label);
   el.dataset.idx = i;
-  el.innerHTML = `
-    <div class="cover">
-      <div class="cover-art" style="background-image:url('${a.cover}')</div>
-      <div class="cover-label">
-        <div class="t">${a.title</div>
-        <div class="a">${a.artist</div>
-     </div>
-   </div>
-    <div class="sleeve">
-      <div class="disc">
-        <div class="label-text">${a.album}<br>${a.year</div>
-        <div class="hole</div>
-     </div>
-   </div>
-  `;
-  el.addEventListener("click", ()=>openAlbum(i));
+  el.innerHTML =
+    '<div class="cover">' +
+      '<div class="cover-art" style="background-image:url(' + a.cover + ')</div>' +
+      '<div class="cover-label">' +
+        '<div class="t">' + a.title +</div>' +
+        '<div class="a">' + a.artist +</div>' +
+     </div>' +
+   </div>' +
+    '<div class="sleeve">' +
+      '<div class="disc">' +
+        '<div class="label-text">' + a.album + '<br>' + a.year +</div>' +
+        '<div class="hole</div>' +
+     </div>' +
+   </div>';
+  el.addEventListener("click", function(){ openAlbum(i); });
   frag.appendChild(el);
 });
 stack.appendChild(frag);
 
-/* ===== dust particles ===== */
 const dust = document.getElementById("dust");
 for(let i=0;i<18;i++){
   const d = document.createElement("i");
-  d.style.left = Math.random()*100+"%";
-  d.style.animationDuration = (12+Math.random()*18)+"s";
-  d.style.animationDelay = (Math.random()*10)+"s";
-  d.style.transform = `scale(${0.5+Math.random()*1.5})`;
-  d.style.opacity = 0.2+Math.random()*0.5;
+  d.style.left = (Math.random()*100) + "%";
+  d.style.animationDuration = (12 + Math.random()*18) + "s";
+  d.style.animationDelay = (Math.random()*10) + "s";
+  d.style.transform = "scale(" + (0.5 + Math.random()*1.5) + ")";
+  d.style.opacity = 0.2 + Math.random()*0.5;
   dust.appendChild(d);
 }
 
-/* ===== open/close ===== */
 const player = document.getElementById("player");
 const audio = document.getElementById("audio");
 const npCover = document.getElementById("np-cover");
@@ -272,48 +190,47 @@ const progressBar = document.getElementById("progress-bar");
 let currentIdx = -1;
 
 function openAlbum(i){
-  const albums = [...stack.querySelectorAll(".album")];
+  const albums = stack.querySelectorAll(".album");
   if(currentIdx === i){ closeAlbum(); return; }
-  albums.forEach((el,j)=>{
-    el.classList.toggle("active", j===i);
-    el.classList.toggle("open", j===i);
+  albums.forEach(function(el,j){
+    if(j===i){ el.classList.add("active","open"); }
+    else{ el.classList.remove("active","open"); }
   });
   document.body.classList.add("opening");
   const a = ALBUMS[i];
-  npCover.style.backgroundImage = `url('${a.cover}')`;
+  npCover.style.backgroundImage = "url(" + a.cover + ")";
   npTitle.textContent = a.title;
-  npArtist.textContent = `${a.artist} — ${a.album}`;
+  npArtist.textContent = a.artist + " \u2014 " + a.album;
   player.classList.add("show");
   audio.src = a.audio;
-  audio.play().catch(()=>{});
-  playBtn.textContent = "❚❚";
+  audio.play().catch(function(){});
+  playBtn.innerHTML = "&#10074;&#10074;";
   currentIdx = i;
 }
 
 function closeAlbum(){
-  const albums = [...stack.querySelectorAll(".album")];
-  albums.forEach(el=>{el.classList.remove("active","open")});
+  const albums = stack.querySelectorAll(".album");
+  albums.forEach(function(el){ el.classList.remove("active","open"); });
   document.body.classList.remove("opening");
   player.classList.remove("show");
   audio.pause();
   currentIdx = -1;
 }
 
-playBtn.addEventListener("click", e=>{
+playBtn.addEventListener("click", function(e){
   e.stopPropagation();
-  if(audio.paused){ audio.play().catch(()=>{}); playBtn.textContent="❚❚"; }
-  else{ audio.pause(); playBtn.textContent="▶"; }
+  if(audio.paused){ audio.play().catch(function(){}); playBtn.innerHTML = "&#10074;&#10074;"; }
+  else{ audio.pause(); playBtn.innerHTML = "&#9654;"; }
 });
 
-audio.addEventListener("timeupdate", ()=>{
-  if(audio.duration) progressBar.style.width = (audio.currentTime/audio.duration*100)+"%";
+audio.addEventListener("timeupdate", function(){
+  if(audio.duration) progressBar.style.width = (audio.currentTime/audio.duration*100) + "%";
 });
-audio.addEventListener("ended", ()=>{ playBtn.textContent="▶"; });
+audio.addEventListener("ended", function(){ playBtn.innerHTML = "&#9654;"; });
 
-/* ===== mobile swipe ===== */
 let touchStartX = 0;
-stack.addEventListener("touchstart", e=>{ touchStartX = e.touches[0].clientX; }, {passive:true});
-stack.addEventListener("touchend", e=>{
+stack.addEventListener("touchstart", function(e){ touchStartX = e.touches[0].clientX; }, {passive:true});
+stack.addEventListener("touchend", function(e){
   const dx = e.changedTouches[0].clientX - touchStartX;
   if(Math.abs(dx) < 50) return;
   if(currentIdx < 0) return;
@@ -323,8 +240,7 @@ stack.addEventListener("touchend", e=>{
   if(albums[next]) albums[next].scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
 }, {passive:true});
 
-/* esc closes */
-document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeAlbum(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeAlbum(); });
 </script>
 </body>
 </html>
