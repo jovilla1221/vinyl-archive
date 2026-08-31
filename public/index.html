@@ -55,7 +55,7 @@
   /* ---------- stage ---------- */
   .stage{position:fixed;inset:0;z-index:10;perspective:1400px;perspective-origin:50% 50%;
     touch-action:none}
-  .rail{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+  .rail{position:absolute;left:50%;top:calc(50% + var(--nav-h) / 2);width:0;height:0;transform-style:preserve-3d}
 
   /* ---------- album ---------- */
   .album{position:absolute;left:0;top:0;width:var(--card);height:var(--card);
@@ -322,7 +322,9 @@ function measure() {
   var vh = window.innerHeight;
   var vw = window.innerWidth;
   var navH = 60;
-  var usable = vh - navH - 96;          /* nav + hint/player breathing room */
+  /* usable area = viewport below the nav row, with a margin for the close button
+     and the player. We size the visible stack so its full span fits there. */
+  var usable = vh - navH - 110;
 
   /* how many neighbours fit above/below the focused album */
   var fit = Math.floor((usable - M.card) / (2 * M.gap));
