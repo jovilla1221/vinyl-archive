@@ -402,6 +402,7 @@ function goTo(v) { target = clampT(v); kick(); }
 
 /* ---------- interactions ---------- */
 function activate(i) {
+  if (suppressClick) return;                              /* came from a drag */
   if (openIdx === i) { closeAlbum(); return; }
   if (Math.abs(i - target) > 0.45) { goTo(i); return; }   /* first click = bring to front */
   openAlbum(i);
@@ -456,35 +457,45 @@ stage.addEventListener("wheel", function (e) {
   }
 }, { passive: false });
 
-/* pointer drag — works for touch, pen and mouse, any orientation */
+/* pointer drag — works for touch, pen and mouse, any orientation.
+   No setPointerCapture: capturing retargets the follow-up click to the stage
+   and the album's own click handler would never fire. Window listeners give
+   the same drag-outside-the-element behaviour without stealing the click. */
 var drag = null;
+var suppressClick = false;
+var DRAG_SLOP = 5;
+
 stage.addEventListener("pointerdown", function (e) {
   if (openIdx >= 0) return;
+  if (e.button !== undefined && e.button !== 0) return;
   drag = { y: e.clientY, x: e.clientX, base: target, moved: false };
-  stage.setPointerCapture(e.pointerId);
 });
-stage.addEventListener("pointermove", function (e) {
+
+window.addEventListener("pointermove", function (e) {
   if (!drag) return;
   var dy = e.clientY - drag.y;
   var dx = e.clientX - drag.x;
   /* landscape-ish viewports read horizontal swipes too */
   var d = Math.abs(dx) > Math.abs(dy) * 1.4 ? dx : dy;
-  if (Math.abs(d) > 4) drag.moved = true;
+  if (!drag.moved && Math.abs(d) <= DRAG_SLOP) return;   /* tap, not a drag */
+  drag.moved = true;
   focus = clampT(drag.base - d / (M.gap * 1.25));
   target = focus;
   layout();
 });
-function endDrag(e) {
+
+function endDrag() {
   if (!drag) return;
-  if (drag.moved) goTo(Math.round(focus));
-  if (e && drag.moved) suppressClick = true;
+  var moved = drag.moved;
   drag = null;
-  setTimeout(function () { suppressClick = false; }, 60);
+  if (moved) {
+    goTo(Math.round(focus));
+    suppressClick = true;                                /* swallow the drag's click */
+    setTimeout(function () { suppressClick = false; }, 80);
+  }
 }
-var suppressClick = false;
-stage.addEventListener("pointerup", endDrag);
-stage.addEventListener("pointercancel", endDrag);
-rail.addEventListener("click", function (e) { if (suppressClick) { e.stopPropagation(); } }, true);
+window.addEventListener("pointerup", endDrag);
+window.addEventListener("pointercancel", endDrag);
 
 /* keyboard */
 document.addEventListener("keydown", function (e) {
